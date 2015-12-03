@@ -1,7 +1,6 @@
 # twitter-race
-Console output python hastag tracker
+Python - twitter hashtag tracker [console based]
 Keep track of different hashtags and see who is winning
-
 
 # Install
 
