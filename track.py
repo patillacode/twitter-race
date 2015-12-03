@@ -1,17 +1,24 @@
 # Import the necessary methods from tweepy library
+import os
+import sys
+import keys
+import json
+import shelve
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
-import json
-import sys
-import os
-import keys
 
 # Variables that contains the user credentials to access Twitter API
 ACCESS_TOKEN = keys.ACCESS_TOKEN
 ACCESS_TOKEN_SECRET = keys.ACCESS_TOKEN_SECRET
 CONSUMER_KEY = keys.CONSUMER_KEY
 CONSUMER_SECRET = keys.CONSUMER_SECRET
+
+DB_PATH = 'track'
+
+
+def open_db():
+    return shelve.open(DB_PATH)
 
 
 # This is a basic listener that just prints received tweets to stdout.
@@ -26,8 +33,15 @@ class Listener(StreamListener):
         if len(hashtags):
             for h in hashtags:
                 if h['text'] in tracker.hashtags:
+                    # we get the hashtag name
                     counter = "{0}_counter".format(h['text'])
-                    setattr(tracker, counter, getattr(tracker, counter) + 1)
+                    # we add 1 to the actual counter
+                    hits = getattr(tracker, counter) + 1
+                    # we set the new value
+                    setattr(tracker, counter, hits)
+                    # store it in the database
+                    tracker.store_data(counter, hits)
+                    # show results in console
                     tracker.results()
         return True
 
@@ -53,6 +67,11 @@ class Tracker():
             setattr(self, "{0}_counter".format(h), 0)
 
         self.set_longest_hashtag()
+
+    def store_data(self, key, value):
+        db = open_db()
+        db[key] = value
+        db.close()
 
     def authenticate(self):
         # Twitter authentication and connection to Twitter Streaming API

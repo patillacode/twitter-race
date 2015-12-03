@@ -6,3 +6,6 @@
 
 # Keys
 keys.py
+
+# Database
+*.db
