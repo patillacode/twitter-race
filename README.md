@@ -5,7 +5,7 @@ Keep track of different hashtags and see who is winning
 # Install
 
 * `pip -r requirements.txt`
-* Remember to set your keys in a `keys.py` file
+* Remember to set your keys in a `keys.py` file (grab them [here](https://apps.twitter.com/))
 ```
 ACCESS_TOKEN = "YOUR ACCESS_TOKEN"
 ACCESS_TOKEN_SECRET = "YOUR ACCESS_TOKEN_SECRET"
