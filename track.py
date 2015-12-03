@@ -36,7 +36,6 @@ class Tracker():
         try:
             assert(isinstance(hashtags, list))
         except AssertionError:
-            print "hashtags must be a list"
             sys.exit(2)
 
         self.known_items = ["hashtags",
@@ -80,7 +79,7 @@ class Tracker():
 
 def usage():
     print "Usage:"
-    print '\ttrack.py -l <hashtaglist>\n'
+    print '\tpython track.py <hashtag#1> <hashtag#2> ... <hashtag#n>\n'
     sys.exit(2)
 
 
