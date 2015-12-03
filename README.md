@@ -14,7 +14,7 @@ CONSUMER_SECRET = "YOUR CONSUMER_SECRET"
 ```
 
 # Usage
-`track.py <hashtag#1> <hashtag#2> ... <hashtag#n>`
+`python track.py <hashtag#1> <hashtag#2> ... <hashtag#n>`
 
 # Output Example
 ```
