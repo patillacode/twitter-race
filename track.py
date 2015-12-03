@@ -19,7 +19,10 @@ class Listener(StreamListener):
 
     def on_data(self, data):
         data = json.loads(data)
-        hashtags = data['entities']['hashtags']
+        hashtags = []
+        if 'entities' in data and 'hashtags' in data['entities']:
+            hashtags = data['entities']['hashtags']
+
         if len(hashtags):
             for h in hashtags:
                 if h['text'] in tracker.hashtags:
@@ -86,7 +89,7 @@ def usage():
 
 if __name__ == '__main__':
 
-    if len(sys.argv[1:]) < 2:
+    if len(sys.argv[1:]) < 1:
         usage()
 
     hashtags = list()
