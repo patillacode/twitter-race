@@ -50,6 +50,7 @@ db.items()
 ```
 * Alternatively you can use the Tracker class, just look at the code ;)
 * Remember the db is not accesible while the code is running to avoid 'Resource temporarily unavailable' issues when db gets hit a lot (I created this with no expectations, a better db mangement would be nice, yes, feel free to add it and pull request, I will be happy to adopt that feature!)
+* Not Python 3.x compatible (yet)
 * Python 2.7.9 or higher is needed because of [this](https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning)
 * DB structure is something like this (key, value):
 ```
