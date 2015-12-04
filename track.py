@@ -44,10 +44,6 @@ CONSUMER_SECRET = keys.CONSUMER_SECRET
 DB_PATH = 'track.db'
 
 
-def open_db():
-    return shelve.open(DB_PATH)
-
-
 # This is a basic listener that just prints received tweets to stdout.
 class Listener(StreamListener):
 
@@ -66,8 +62,10 @@ class Listener(StreamListener):
                     hits = getattr(tracker, counter) + 1
                     # we set the new value
                     setattr(tracker, counter, hits)
-                    # store it in the database
-                    tracker.store_data(counter, hits)
+                    # store it in database
+                    tracker.set_data(counter, hits)
+                    # store whole tweet in database
+                    tracker.set_data(str(data['id']), data)
                     # show results table in console
                     tracker.results_table()
         return True
@@ -77,28 +75,39 @@ class Listener(StreamListener):
 
 
 class Tracker():
-    def __init__(self, hashtags):
+    def __init__(self, hashtags=[]):
+        # Confirm hashtags are given in a list
         try:
             assert(isinstance(hashtags, list))
         except AssertionError:
             sys.exit(2)
 
-        self.known_items = ["hashtags",
-                            "listener",
-                            "stream",
-                            "known_items",
-                            "longest"]
-
+        # Set all known attributes
+        self.db = None
+        self.stream = None
+        self.listener = None
         self.hashtags = hashtags
+        self.set_longest_hashtag()
+        # Set a list for all known attributes
+        self.set_known_items()
+
+        # Set dynamic attributes (counters for each hashtag)
         for h in self.hashtags:
             setattr(self, "{0}_counter".format(h), 0)
 
-        self.set_longest_hashtag()
+    def set_known_items(self):
+        self.known_items = []
+        for k, v in self.__dict__.iteritems():
+            self.known_items.append(k)
 
-    def store_data(self, key, value):
-        db = open_db()
-        db[key] = value
-        db.close()
+    def set_data(self, key, value):
+        self.db[key] = value
+
+    def open_db(self):
+        self.db = shelve.open(DB_PATH)
+
+    def close_db(self):
+        self.db.close()
 
     def authenticate(self):
         # Twitter authentication and connection to Twitter Streaming API
@@ -122,15 +131,20 @@ class Tracker():
         counter_whitespace = " " * ((cell_size - 5) / 2)
         border = "-" * ((cell_size * 2) + 1)
 
-        # print table
+        # print table top border
         print " {0} ".format(border)
+        # Grab all counters and print their value
         for k, v in self.__dict__.iteritems():
             if k not in self.known_items:
+                # For better output we calculate the whitespace necessary
+                # depending on each hashtag length
                 hashtag_whitespace = " " * (self.longest - len(k) + 9)
+                # print out the hashtaga and its counter value
                 print "| {0}{1} |{2}{3}{2}|".format(k[:-8],
                                                     hashtag_whitespace,
                                                     counter_whitespace,
                                                     str(v).zfill(5))
+        # print table bottom border
         print " {0} ".format(border)
 
 
@@ -142,15 +156,28 @@ def usage():
 
 if __name__ == '__main__':
 
-    if len(sys.argv[1:]) < 1:
-        usage()
+    try:
+        if len(sys.argv[1:]) < 1:
+            usage()
 
-    hashtags = list()
-    for a in sys.argv[1:]:
+        hashtags = list()
         # list of hashtags to track
-        hashtags.append(str(a))
+        for a in sys.argv[1:]:
+            hashtags.append(str(a))
 
-    tracker = Tracker(hashtags)
-    stream = tracker.authenticate()
-    # This line filter Twitter Streams to capture data by the keywords
-    stream.filter(track=tracker.hashtags)
+        # Create Tracker with given hastags
+        tracker = Tracker(hashtags)
+        stream = tracker.authenticate()
+        # open db - DB is not accesible during the execution to avoid
+        # 'Resource temporarily unavailable' issues when it's hit a lot
+        tracker.open_db()
+
+        # Capture data by the keywords
+        stream.filter(track=tracker.hashtags)
+
+    except:
+        pass
+
+    finally:
+        # Always close db
+        tracker.close_db()
