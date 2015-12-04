@@ -1,3 +1,30 @@
+#!/usr/bin/env python
+#
+# This file is part of Twitter Race.  Twitter Race is free software: you can
+# redistribute it and/or modify it under the terms of the GNU General Public
+# License as published by the Free Software Foundation, version 2.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# Copyright Patilla Code
+#
+# title           :track.py
+# description     :Stream Listener and tracker for tweets with given hashtags
+# author          :PatilaCode
+# date            :20151203
+# version         :0.1
+# usage           :python track.py <hashtag#1> <hashtag#2> ... <hashtag#n>
+# notes           :
+# python_version  :2.7.10
+# =============================================================================
+
 # Import the necessary methods from tweepy library
 import os
 import sys
@@ -102,7 +129,7 @@ class Tracker():
 
 def usage():
     print "Usage:"
-    print '\tpython track.py <hashtag#1> <hashtag#2> ... <hashtag#n>\n'
+    print "\tpython track.py <hashtag#1> <hashtag#2> ... <hashtag#n>\n"
     sys.exit(2)
 
 
