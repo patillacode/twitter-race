@@ -2,10 +2,11 @@
 A python hashtag tracker for twitter [console based]
 Keep track of different hashtags and see who is winning
 
-* See live how many tweets have the hashtags your are looking for
-* DB stores counters for each hastag given
+* See live how many tweets are sent with the hashtags your are looking for
+* DB stores counters for each hashtag given
 * DB stores each tweet (as a json) that has one of your given hashtags for a deeper later analysis if wanted
 
+ Please report issues, enhancements you can think of, suggestions, whatever!
 ------------
 
 ## Install
@@ -28,11 +29,12 @@ CONSUMER_SECRET = "YOUR CONSUMER_SECRET"
 
 ## Output Example
 ```
-##########################
-# python      #   00019   #
-# javascript  #   00046   #
-# ruby        #   00011   #
-##########################
+ -------------------------
+| python      |   00004   |
+| javascript  |   00013   |
+| php         |   00012   |
+| ruby        |   00000   |
+ -------------------------
 ```
 
 ------------
@@ -48,7 +50,7 @@ db.items()
 ```
 * Alternatively you can use the Tracker class, just look at the code ;)
 * Remember the db is not accesible while the code is running to avoid 'Resource temporarily unavailable' issues when db gets hit a lot (I created this with no expectations, a better db mangement would be nice, yes, feel free to add it and pull request, I will be happy to adopt that feature!)
-* Python 2.9 or higher is needed because of [this](https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning)
+* Python 2.7.9 or higher is needed because of [this](https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning)
 * DB structure is something like this (key, value):
 ```
 db['<yourhastag>_counter'] = 17
