@@ -22,6 +22,7 @@ import shelve
 shelve.open('track.db')
 db.items()
 ```
+* Python 2.9 or higher is needed because of [this](https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning)
 
 # Usage
 `python track.py <hashtag#1> <hashtag#2> ... <hashtag#n>`
