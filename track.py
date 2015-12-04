@@ -41,7 +41,7 @@ ACCESS_TOKEN_SECRET = keys.ACCESS_TOKEN_SECRET
 CONSUMER_KEY = keys.CONSUMER_KEY
 CONSUMER_SECRET = keys.CONSUMER_SECRET
 
-DB_PATH = 'track'
+DB_PATH = 'track.db'
 
 
 def open_db():
@@ -68,8 +68,8 @@ class Listener(StreamListener):
                     setattr(tracker, counter, hits)
                     # store it in the database
                     tracker.store_data(counter, hits)
-                    # show results in console
-                    tracker.results()
+                    # show results table in console
+                    tracker.results_table()
         return True
 
     def on_error(self, status):
@@ -114,17 +114,24 @@ class Tracker():
             if len(h) > self.longest:
                 self.longest = len(h)
 
-    def results(self):
+    def results_table(self):
+        # clear console
         os.system('clear')
-        cell_size = (self.longest + 3)
-        print "#" * (cell_size * 2)
+        # define stuff for console output
+        cell_size = (self.longest + 2)
+        counter_whitespace = " " * ((cell_size - 5) / 2)
+        border = "-" * ((cell_size * 2) + 1)
+
+        # print table
+        print " {0} ".format(border)
         for k, v in self.__dict__.iteritems():
             if k not in self.known_items:
-                whitespace = " " * (self.longest - len(k) + 9)
-                print "# {0}{1} #   {2}  #".format(k[:-8],
-                                                   whitespace,
-                                                   str(v).zfill(5))
-        print "#" * (cell_size * 2)
+                hashtag_whitespace = " " * (self.longest - len(k) + 9)
+                print "| {0}{1} |{2}{3}{2}|".format(k[:-8],
+                                                    hashtag_whitespace,
+                                                    counter_whitespace,
+                                                    str(v).zfill(5))
+        print " {0} ".format(border)
 
 
 def usage():
