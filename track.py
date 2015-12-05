@@ -246,7 +246,7 @@ if __name__ == '__main__':
                             required=False,
                             default="database",
                             help="Path for the database file \
-                                  [default: track.db]")
+                                  [default: database.db]")
 
         args = parser.parse_args()
 

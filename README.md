@@ -29,7 +29,7 @@ usage: track.py [-h] --hashtags [HASHTAGS [HASHTAGS ...]] [-d DB]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -d DB, --db DB        Path for the database file [default: track.db]
+  -d DB, --db DB        Path for the database file [default: database.db]
 
 mandatory arguments:
   --hashtags [HASHTAGS [HASHTAGS ...]]
@@ -58,12 +58,12 @@ mandatory arguments:
 ------------
 
 ## Notes
-* All hits will be stored in a db (`track.db` by default)
+* All hits will be stored in a db (`database.db` by default)
 * Also, a counter will be created in the database for each hashtag as `<hashtag>_counter`
 * To access the db run a python console and:
 ```
 import shelve
-shelve.open('track.db')
+shelve.open('database.db')
 db.items()
 ```
 * Alternatively you can use the Tracker class, just look at the code ;)
