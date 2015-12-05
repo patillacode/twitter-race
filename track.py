@@ -31,7 +31,7 @@
 # author          :PatilaCode
 # date            :20151203
 # version         :0.1
-# usage           :python track.py <hashtag#1> <hashtag#2> ... <hashtag#n>
+# usage           :python track.py --hashtags <hashtag#1> ... <hashtag#n>
 # notes           :
 # python_version  :2.7.10
 # =============================================================================
