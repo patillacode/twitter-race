@@ -31,9 +31,16 @@ import sys
 import keys
 import json
 import shelve
+import argparse
+import logging
+import traceback
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
+
+logging.basicConfig(filename='track.log',
+                    level=logging.ERROR,
+                    format='%(asctime)s %(levelname)s %(message)s')
 
 # Variables that contains the user credentials to access Twitter API
 ACCESS_TOKEN = keys.ACCESS_TOKEN
@@ -41,6 +48,7 @@ ACCESS_TOKEN_SECRET = keys.ACCESS_TOKEN_SECRET
 CONSUMER_KEY = keys.CONSUMER_KEY
 CONSUMER_SECRET = keys.CONSUMER_SECRET
 
+# DB filename/path
 DB_PATH = 'track.db'
 
 
@@ -71,7 +79,8 @@ class Listener(StreamListener):
         return True
 
     def on_error(self, status):
-        print "Error: {0}".format(status)
+        logging.err("Listener had problems connecting. Status: {0}".format(
+            status))
 
 
 class Tracker():
@@ -132,7 +141,7 @@ class Tracker():
         border = "-" * ((cell_size * 2) + 1)
 
         # print table top border
-        print " {0} ".format(border)
+        sys.stderr.write(" {0} \n".format(border))
         # Grab all counters and print their value
         for k, v in self.__dict__.iteritems():
             if k not in self.known_items:
@@ -140,43 +149,59 @@ class Tracker():
                 # depending on each hashtag length
                 hashtag_whitespace = " " * (self.longest - len(k) + 9)
                 # print out the hashtaga and its counter value
-                print "| {0}{1} |{2}{3}{2}|".format(k[:-8],
-                                                    hashtag_whitespace,
-                                                    counter_whitespace,
-                                                    str(v).zfill(5))
+                sys.stderr.write("| {0}{1} |{2}{3}{2}|\n".format(
+                    k[:-8],
+                    hashtag_whitespace,
+                    counter_whitespace,
+                    str(v).zfill(5)))
         # print table bottom border
-        print " {0} ".format(border)
+        sys.stderr.write(" {0} \n".format(border))
 
 
-def usage():
-    print "Usage:"
-    print "\tpython track.py <hashtag#1> <hashtag#2> ... <hashtag#n>\n"
-    sys.exit(2)
-
+class TrackParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write('error: {0}\n\n'.format(message))
+        self.print_help()
+        sys.exit(2)
 
 if __name__ == '__main__':
 
     try:
-        if len(sys.argv[1:]) < 1:
-            usage()
+        parser = TrackParser()
+        mand = parser.add_argument_group("mandatory arguments")
+        mand.add_argument('--hashtags',
+                          required=True,
+                          nargs='*',
+                          help="Track the given hashtags")
+        parser.add_argument("-d",
+                            "--db",
+                            required=False,
+                            default="track.db",
+                            help="Path for the database file \
+                                  [default: track.db]")
 
-        hashtags = list()
-        # list of hashtags to track
-        for a in sys.argv[1:]:
-            hashtags.append(str(a))
+        args = parser.parse_args()
 
+    except:
+        logging.error(traceback.format_exc())
+        sys.exit(2)
+
+    try:
+        # Set up DB path
+        DB_PATH = args.db
         # Create Tracker with given hastags
-        tracker = Tracker(hashtags)
+        tracker = Tracker(args.hashtags)
         stream = tracker.authenticate()
-        # open db - DB is not accesible during the execution to avoid
-        # 'Resource temporarily unavailable' issues when it's hit a lot
+        # open db
         tracker.open_db()
-
         # Capture data by the keywords
         stream.filter(track=tracker.hashtags)
 
+    except KeyboardInterrupt:
+        logging.debug("Farewell!")
+
     except:
-        pass
+        logging.error(traceback.format_exc())
 
     finally:
         # Always close db
