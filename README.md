@@ -43,7 +43,7 @@ mandatory arguments:
  * This will start tracking all tweets with either #python or #javascript
  `python track.py --hashtags python javascript -d database`
 
- *Output will be something like this:
+ * Output will be something like this:
 ```
  -------------------------
 | python      |   00003   |
