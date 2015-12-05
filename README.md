@@ -33,7 +33,7 @@ optional arguments:
 
 mandatory arguments:
   --hashtags [HASHTAGS [HASHTAGS ...]]
-                        Track the given hashtags
+
 ```
 
 ------------
