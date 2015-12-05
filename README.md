@@ -5,6 +5,7 @@ Keep track of different hashtags and see who is winning
 * See live how many tweets are sent with the hashtags your are looking for
 * DB stores counters for each hashtag given
 * DB stores each tweet (as a json) that has one of your given hashtags for a deeper later analysis if wanted
+* Specify the DB name to
 
  Please report issues, enhancements you can think of, suggestions, whatever!
 ------------
@@ -23,19 +24,36 @@ CONSUMER_SECRET = "YOUR CONSUMER_SECRET"
 ------------
 
 ## Usage
-`python track.py <hashtag#1> <hashtag#2> ... <hashtag#n>`
+```
+usage: track.py [-h] --hashtags [HASHTAGS [HASHTAGS ...]] [-d DB]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DB, --db DB        Path for the database file [default: track.db]
+
+mandatory arguments:
+  --hashtags [HASHTAGS [HASHTAGS ...]]
+                        Track the given hashtags
+```
 
 ------------
 
-## Output Example
+## Example
+
+ * This will start tracking all tweets with either #python or #javascript
+ `python track.py --hashtags python javascript -d database`
+
+ *Output will be something like this:
 ```
  -------------------------
-| python      |   00004   |
-| javascript  |   00013   |
-| php         |   00012   |
-| ruby        |   00000   |
+| python      |   00003   |
+| javascript  |   00014   |
  -------------------------
 ```
+
+* A logger file will be created: `track.log`
+
+* And a database file also: `database.db`
 
 ------------
 
