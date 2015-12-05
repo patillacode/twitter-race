@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 #
+#    _/                          _/    _/      _/
+# _/_/_/_/  _/      _/      _/      _/_/_/_/_/_/_/_/    _/_/    _/  _/_/
+#  _/      _/      _/      _/  _/    _/      _/      _/_/_/_/  _/_/
+# _/        _/  _/  _/  _/    _/    _/      _/      _/        _/
+#  _/_/      _/      _/      _/      _/_/    _/_/    _/_/_/  _/
+#
+#    _/  _/_/    _/_/_/    _/_/_/    _/_/
+#   _/_/      _/    _/  _/        _/_/_/_/
+#  _/        _/    _/  _/        _/
+# _/          _/_/_/    _/_/_/    _/_/_/
+#
 # This file is part of Twitter Race.  Twitter Race is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
 # License as published by the Free Software Foundation, version 2.
@@ -52,10 +63,16 @@ CONSUMER_SECRET = keys.CONSUMER_SECRET
 DB_PATH = 'track.db'
 
 
-# This is a basic listener that just prints received tweets to stdout.
 class Listener(StreamListener):
+    """This is a basic listener that just prints received tweets."""
 
     def on_data(self, data):
+        """
+        What to do on the event of receiving data while listening
+
+        Args:
+            data: Response form twitter API with the tracked tweet
+        """
         data = json.loads(data)
         hashtags = []
         if 'entities' in data and 'hashtags' in data['entities']:
@@ -79,12 +96,34 @@ class Listener(StreamListener):
         return True
 
     def on_error(self, status):
-        logging.err("Listener had problems connecting. Status: {0}".format(
+        """
+        Log if an error occurs when accessing the API
+
+        Args:
+            status (int): HTTP status code
+        """
+        logging.error("Listener had problems connecting. Status: {0}".format(
             status))
 
 
 class Tracker():
+    """
+    Main class that handles most of our app.
+
+    Attributes:
+        db (str): path to db
+        hashtags (list): hashtags to keep track of
+        known_items (list): all known attributes of the class
+        listener (Listener): Twitter StreamListener
+        longest (int): length of longest hashtags (for output purposes)
+        stream (Stream): Twitter authenticated stream of data
+    """
+
     def __init__(self, hashtags=[]):
+        """
+        Args:
+            hashtags (list, optional): hashtags entered as parameters
+        """
         # Confirm hashtags are given in a list
         try:
             assert(isinstance(hashtags, list))
@@ -105,20 +144,37 @@ class Tracker():
             setattr(self, "{0}_counter".format(h), 0)
 
     def set_known_items(self):
+        """ Sets the known_items attribute with all static attributes"""
         self.known_items = []
         for k, v in self.__dict__.iteritems():
             self.known_items.append(k)
 
     def set_data(self, key, value):
+        """
+
+        To set a value in the database
+
+        Args:
+            key (str): the key for the record to be saved
+            value (*): the value for the record to be saved
+        """
         self.db[key] = value
 
     def open_db(self):
+        """ Opens the db file to be accessed """
         self.db = shelve.open(DB_PATH)
 
     def close_db(self):
+        """ Closes the db file """
         self.db.close()
 
     def authenticate(self):
+        """
+        To authenticate wiht the Twitter API
+
+        Returns:
+            Stream: Twitter authenticated Stream object
+        """
         # Twitter authentication and connection to Twitter Streaming API
         self.listener = Listener()
         auth = OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -127,12 +183,14 @@ class Tracker():
         return self.stream
 
     def set_longest_hashtag(self):
+        """ Sets our longest_hashtag attribute """
         self.longest = 0
         for h in self.hashtags:
             if len(h) > self.longest:
                 self.longest = len(h)
 
     def results_table(self):
+        """ Prints table with current result into console """
         # clear console
         os.system('clear')
         # define stuff for console output
@@ -159,24 +217,34 @@ class Tracker():
 
 
 class TrackParser(argparse.ArgumentParser):
+    """ Custom arguments parser """
     def error(self, message):
-        sys.stderr.write('error: {0}\n\n'.format(message))
+        """
+        Custom error output method
+
+        Args:
+            message (str): message to be displayed
+        """
+        link = "https://github.com/patillacode/twitter-race"
+        sys.stderr.write('\nerror: {0}\n\n'.format(message))
         self.print_help()
+        sys.stderr.write('\nPlease check the README or go to {0}\n\n'.format(
+            link))
         sys.exit(2)
 
 if __name__ == '__main__':
 
     try:
         parser = TrackParser()
-        mand = parser.add_argument_group("mandatory arguments")
-        mand.add_argument('--hashtags',
-                          required=True,
-                          nargs='*',
-                          help="Track the given hashtags")
+        mandatory = parser.add_argument_group("mandatory arguments")
+        mandatory.add_argument('--hashtags',
+                               required=True,
+                               nargs='*',
+                               help="")
         parser.add_argument("-d",
                             "--db",
                             required=False,
-                            default="track.db",
+                            default="database",
                             help="Path for the database file \
                                   [default: track.db]")
 
