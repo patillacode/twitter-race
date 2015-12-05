@@ -92,7 +92,7 @@ class Listener(StreamListener):
                     # store whole tweet in database
                     tracker.set_data(str(data['id']), data)
                     # show results table in console
-                    tracker.results_table()
+                    tracker.print_table()
         return True
 
     def on_error(self, status):
@@ -130,24 +130,30 @@ class Tracker():
         except AssertionError:
             sys.exit(2)
 
-        # Set all known attributes
+        # Set all static attributes
         self.db = None
         self.stream = None
         self.listener = None
         self.hashtags = hashtags
         self.set_longest_hashtag()
-        # Set a list for all known attributes
-        self.set_known_items()
+
+        # define vars needed for console output (also static)
+        self.cell_size = (self.longest + 3)
+        self.counter_whitespace = " " * ((self.cell_size - 6) / 2)
+        self.border = "-" * ((self.cell_size * 2) + 1)
+
+        # # Set a list for all known attributes
+        # self.set_known_items()
 
         # Set dynamic attributes (counters for each hashtag)
         for h in self.hashtags:
             setattr(self, "{0}_counter".format(h), 0)
 
-    def set_known_items(self):
-        """ Sets the known_items attribute with all static attributes"""
-        self.known_items = []
-        for k, v in self.__dict__.iteritems():
-            self.known_items.append(k)
+    # def set_known_items(self):
+    #     """ Sets the known_items attribute with all static attributes"""
+    #     self.known_items = []
+    #     for k, v in self.__dict__.iteritems():
+    #         self.known_items.append(k)
 
     def set_data(self, key, value):
         """
@@ -170,10 +176,10 @@ class Tracker():
 
     def authenticate(self):
         """
-        To authenticate wiht the Twitter API
+        Authenticate against the Twitter API
 
         Returns:
-            Stream: Twitter authenticated Stream object
+            Stream: <Twitter authenticated Stream object>
         """
         # Twitter authentication and connection to Twitter Streaming API
         self.listener = Listener()
@@ -189,31 +195,53 @@ class Tracker():
             if len(h) > self.longest:
                 self.longest = len(h)
 
-    def results_table(self):
+    def get_winning_hashtag(self):
+        """
+        Get currently winning hashtag
+
+        Returns:
+            str: <winner>
+        """
+        winner = {'hashtag': '', 'value': 0}
+        for h in self.hashtags:
+            counter = "{0}_counter".format(h)
+            hits = getattr(self, counter)
+            if hits > winner['value']:
+                winner['hashtag'] = h
+                winner['value'] = hits
+        return winner['hashtag']
+
+    def print_table(self):
         """ Prints table with current result into console """
         # clear console
         os.system('clear')
-        # define stuff for console output
-        cell_size = (self.longest + 2)
-        counter_whitespace = " " * ((cell_size - 5) / 2)
-        border = "-" * ((cell_size * 2) + 1)
 
         # print table top border
-        sys.stderr.write(" {0} \n".format(border))
+        sys.stderr.write(" {0} \n".format(self.border))
+
         # Grab all counters and print their value
-        for k, v in self.__dict__.iteritems():
-            if k not in self.known_items:
-                # For better output we calculate the whitespace necessary
-                # depending on each hashtag length
-                hashtag_whitespace = " " * (self.longest - len(k) + 9)
-                # print out the hashtaga and its counter value
-                sys.stderr.write("| {0}{1} |{2}{3}{2}|\n".format(
-                    k[:-8],
-                    hashtag_whitespace,
-                    counter_whitespace,
-                    str(v).zfill(5)))
+        for h in self.hashtags:
+            # For better output we calculate the whitespace necessary
+            # depending on each hashtag length
+            hashtag_whitespace = " " * (self.longest - len(h) + 3)
+
+            counter = "{0}_counter".format(h)
+            hits = getattr(tracker, counter)
+
+            # set winner banner for output
+            winner_banner = ''
+            if h is self.get_winning_hashtag():
+                winner_banner = ' # WINNER #'
+            # print out the hashtaga and its counter value
+            sys.stderr.write("| {0}{1} |{2}{3}{2}|{4}\n".format(
+                h,
+                hashtag_whitespace,
+                self.counter_whitespace,
+                str(hits).zfill(5),
+                winner_banner))
+
         # print table bottom border
-        sys.stderr.write(" {0} \n".format(border))
+        sys.stderr.write(" {0} \n".format(self.border))
 
 
 class TrackParser(argparse.ArgumentParser):
@@ -257,7 +285,7 @@ if __name__ == '__main__':
     try:
         # Set up DB path
         DB_PATH = args.db
-        # Create Tracker with given hastags
+        # Create Tracker with given hashtags
         tracker = Tracker(args.hashtags)
         stream = tracker.authenticate()
         # open db
