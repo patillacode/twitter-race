@@ -9,3 +9,6 @@ keys.py
 
 # Database
 *.db
+
+# Logs
+*.log
