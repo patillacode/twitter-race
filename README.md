@@ -40,16 +40,14 @@ mandatory arguments:
 
 ## Example
 
- * This will start tracking all tweets with either #python or #javascript
- `python track.py --hashtags python javascript -d database`
+* To start tracking all tweets with #money, #sex, #love or #health
+* Run: `python track.py --hashtags money sex love health`
 
- * Output will be something like this:
+* Output will be something like this:
 
 ![alt tag](http://i.imgur.com/VvIK5IN.png)
 
-
 * A logger file will be created: `track.log`
-
 * And a database file also: `database.db`
 
 ------------
