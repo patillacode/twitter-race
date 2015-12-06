@@ -36,7 +36,6 @@
 # python_version  :2.7.10
 # =============================================================================
 
-# Import the necessary methods from tweepy library
 import os
 import sys
 import keys
@@ -45,9 +44,10 @@ import shelve
 import argparse
 import logging
 import traceback
-from tweepy.streaming import StreamListener
-from tweepy import OAuthHandler
+
 from tweepy import Stream
+from tweepy import OAuthHandler
+from tweepy.streaming import StreamListener
 
 logging.basicConfig(filename='track.log',
                     level=logging.ERROR,
@@ -59,8 +59,8 @@ ACCESS_TOKEN_SECRET = keys.ACCESS_TOKEN_SECRET
 CONSUMER_KEY = keys.CONSUMER_KEY
 CONSUMER_SECRET = keys.CONSUMER_SECRET
 
-# DB filename/path
-DB_PATH = 'track.db'
+# DB filename/path (set via argparse)
+DB_PATH = ''
 
 
 class Listener(StreamListener):
@@ -142,18 +142,9 @@ class Tracker():
         self.counter_whitespace = " " * ((self.cell_size - 6) / 2)
         self.border = "-" * ((self.cell_size * 2) + 1)
 
-        # # Set a list for all known attributes
-        # self.set_known_items()
-
         # Set dynamic attributes (counters for each hashtag)
         for h in self.hashtags:
             setattr(self, "{0}_counter".format(h), 0)
-
-    # def set_known_items(self):
-    #     """ Sets the known_items attribute with all static attributes"""
-    #     self.known_items = []
-    #     for k, v in self.__dict__.iteritems():
-    #         self.known_items.append(k)
 
     def set_data(self, key, value):
         """
