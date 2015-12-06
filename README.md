@@ -68,5 +68,6 @@ db.items()
 * DB structure is something like this (key, value):
 ```
 db['<yourhastag>_counter'] = 17
-db['<tweet_id>'] = {[<tweet>](https://gist.github.com/patillacode/1fc239540ec006dd70a7#file-tweet-py)}
+db['<tweet_id>'] = {<tweeet>}
 ```
+* Example of [storaged tweet](https://gist.github.com/patillacode/1fc239540ec006dd70a7#file-tweet-py)
