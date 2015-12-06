@@ -62,16 +62,24 @@ CONSUMER_SECRET = keys.CONSUMER_SECRET
 # DB filename/path (set via argparse)
 DB_PATH = ''
 
+# Colors definition for output
+COLORS = {'magenta': '35',
+          'green': '32',
+          'red': '33;1',
+          'cyan': '36',
+          'white': '37;1',
+          'yellow': '33'}
+
 
 class Listener(StreamListener):
     """This is a basic listener that just prints received tweets."""
 
     def on_data(self, data):
         """
-        What to do on the event of receiving data while listening
+            What to do on the event of receiving data while listening
 
-        Args:
-            data: Response form twitter API with the tracked tweet
+            Args:
+                data: Response form twitter API with the tracked tweet
         """
         data = json.loads(data)
         hashtags = []
@@ -97,10 +105,10 @@ class Listener(StreamListener):
 
     def on_error(self, status):
         """
-        Log if an error occurs when accessing the API
+            Log if an error occurs when accessing the API
 
-        Args:
-            status (int): HTTP status code
+            Args:
+                status (int): HTTP status code
         """
         logging.error("Listener had problems connecting. Status: {0}".format(
             status))
@@ -108,21 +116,21 @@ class Listener(StreamListener):
 
 class Tracker():
     """
-    Main class that handles most of our app.
+        Main class that handles most of our app.
 
-    Attributes:
-        db (str): path to db
-        hashtags (list): hashtags to keep track of
-        known_items (list): all known attributes of the class
-        listener (Listener): Twitter StreamListener
-        longest (int): length of longest hashtags (for output purposes)
-        stream (Stream): Twitter authenticated stream of data
+        Attributes:
+            db (str): path to db
+            hashtags (list): hashtags to keep track of
+            known_items (list): all known attributes of the class
+            listener (Listener): Twitter StreamListener
+            longest (int): length of longest hashtags (for output purposes)
+            stream (Stream): Twitter authenticated stream of data
     """
 
     def __init__(self, hashtags=[]):
         """
-        Args:
-            hashtags (list, optional): hashtags entered as parameters
+            Args:
+                hashtags (list, optional): hashtags entered as parameters
         """
         # Confirm hashtags are given in a list
         try:
@@ -149,11 +157,11 @@ class Tracker():
     def set_data(self, key, value):
         """
 
-        To set a value in the database
+            To set a value in the database
 
-        Args:
-            key (str): the key for the record to be saved
-            value (*): the value for the record to be saved
+            Args:
+                key (str): the key for the record to be saved
+                value (*): the value for the record to be saved
         """
         self.db[key] = value
 
@@ -167,10 +175,10 @@ class Tracker():
 
     def authenticate(self):
         """
-        Authenticate against the Twitter API
+            Authenticate against the Twitter API
 
-        Returns:
-            Stream: <Twitter authenticated Stream object>
+            Returns:
+                Stream: <Twitter authenticated Stream object>
         """
         # Twitter authentication and connection to Twitter Streaming API
         self.listener = Listener()
@@ -188,10 +196,10 @@ class Tracker():
 
     def get_winning_hashtag(self):
         """
-        Get currently winning hashtag
+            Get currently winning hashtag
 
-        Returns:
-            str: <winner>
+            Returns:
+                str: <winner>
         """
         winner = {'hashtag': '', 'value': 0}
         for h in self.hashtags:
@@ -202,47 +210,75 @@ class Tracker():
                 winner['value'] = hits
         return winner['hashtag']
 
+    def colorize(self, color, message):
+        """
+            Colorizes given message with given color
+
+            Args:
+                color (str): Parsed with global var COLORS
+                message (str): message to be colorized
+
+            Returns:
+                str: message with requested color codes
+        """
+        return "\033[{0}m{1}\033[0m".format(COLORS[color], message)
+
     def print_table(self):
-        """ Prints table with current result into console """
+        """ Prints table with live results into console """
         # clear console
         os.system('clear')
 
+        # Colorize table items!
+        border = self.colorize('cyan', self.border)
+        separator = self.colorize('cyan', '|')
+
         # print table top border
-        sys.stderr.write(" {0} \n".format(self.border))
+        sys.stderr.write(" {0} \n".format(border))
 
         # Grab all counters and print their value
-        for h in self.hashtags:
+        for hashtag in self.hashtags:
             # For better output we calculate the whitespace necessary
             # depending on each hashtag length
-            hashtag_whitespace = " " * (self.longest - len(h) + 3)
+            hashtag_whitespace = " " * (self.longest - len(hashtag) + 3)
 
-            counter = "{0}_counter".format(h)
+            # get number of hits for each hashtag
+            counter = "{0}_counter".format(hashtag)
             hits = getattr(tracker, counter)
 
-            # set winner banner for output
+            # set winner banner and color for output
             winner_banner = ''
-            if h is self.get_winning_hashtag():
-                winner_banner = ' # WINNER #'
-            # print out the hashtaga and its counter value
-            sys.stderr.write("| {0}{1} |{2}{3}{2}|{4}\n".format(
-                h,
+            color = 'yellow'
+
+            # set different banner and different color for winning hashtag
+            if hashtag is self.get_winning_hashtag():
+                winner_banner = self.colorize('magenta', ' # WINNING #')
+                color = 'green'
+
+            # Colorize
+            hashtag = self.colorize(color, hashtag)
+            hits = self.colorize(color, str(hits).zfill(5))
+
+            # output table contents
+            sys.stderr.write('{0} {1}{2} {0}{3}{4}{3}{0}{5}\n'.format(
+                separator,
+                hashtag,
                 hashtag_whitespace,
                 self.counter_whitespace,
-                str(hits).zfill(5),
+                hits,
                 winner_banner))
 
         # print table bottom border
-        sys.stderr.write(" {0} \n".format(self.border))
+        sys.stderr.write(" {0} \n".format(border))
 
 
 class TrackParser(argparse.ArgumentParser):
     """ Custom arguments parser """
     def error(self, message):
         """
-        Custom error output method
+            Custom error output method
 
-        Args:
-            message (str): message to be displayed
+            Args:
+                message (str): message to be displayed
         """
         link = "https://github.com/patillacode/twitter-race"
         sys.stderr.write('\nerror: {0}\n\n'.format(message))

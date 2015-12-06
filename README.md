@@ -44,12 +44,9 @@ mandatory arguments:
  `python track.py --hashtags python javascript -d database`
 
  * Output will be something like this:
-```
- -------------------------
-| python      |   00003   |
-| javascript  |   00014   |
- -------------------------
-```
+
+![alt tag](http://i.imgur.com/VvIK5IN.png)
+
 
 * A logger file will be created: `track.log`
 
