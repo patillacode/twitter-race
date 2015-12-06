@@ -1,13 +1,14 @@
 # twitter-race
 A python hashtag tracker for twitter [console based]
-Keep track of different hashtags and see who is winning
 
-* See live how many tweets are sent with the hashtags your are looking for
-* DB stores counters for each hashtag given
-* DB stores each tweet (as a json) that has one of your given hashtags for a deeper later analysis if wanted
-* Specify the DB name to
+Keep track of different hashtags and see which one is winning
 
- Please report issues, enhancements you can think of, suggestions, whatever!
+* See live in your console how many tweets are being sent containing the hashtags your are looking for
+* Database stored counters for each hashtag given
+* Database stored tweets (as a json) that have one of your given hashtags (for a deeper later analysis if wanted)
+* You can specify the database name as a parameter to have multiple ones, for different analysis.
+
+ #### Please report issues, enhancements you can think of, suggestions, whatever!
 ------------
 
 ## Install
