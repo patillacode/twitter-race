@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='twitter-race',
-    version='0.0.2',
+    version='0.0.3',
     description='',
     license='GPLv2',
     py_modules=['track'],
