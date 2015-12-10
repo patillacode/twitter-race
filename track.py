@@ -99,8 +99,9 @@ class Listener(StreamListener):
                     tracker.set_data(counter, hits)
                     # store whole tweet in database
                     tracker.set_data(str(data['id']), data)
-                    # show results table in console
-                    tracker.print_table()
+                    # show results table in console if verbose was indicated
+                    if tracker.verbose:
+                        tracker.print_table()
         return True
 
     def on_error(self, status):
@@ -127,7 +128,7 @@ class Tracker():
             stream (Stream): Twitter authenticated stream of data
     """
 
-    def __init__(self, hashtags=[]):
+    def __init__(self, verbose, hashtags=[]):
         """
             Args:
                 hashtags (list, optional): hashtags entered as parameters
@@ -144,7 +145,7 @@ class Tracker():
         self.listener = None
         self.hashtags = hashtags
         self.set_longest_hashtag()
-
+        self.verbose = verbose
         # define vars needed for console output (also static)
         self.cell_size = (self.longest + 3)
         self.counter_whitespace = " " * ((self.cell_size - 6) / 2)
@@ -299,9 +300,16 @@ if __name__ == '__main__':
         parser.add_argument("-d",
                             "--db",
                             required=False,
-                            default="database",
+                            default="database.db",
                             help="Path for the database file \
                                   [default: database.db]")
+        parser.add_argument("-v",
+                            "--verbose",
+                            required=False,
+                            action="store_true",
+                            default=False,
+                            help="Show table with live data \
+                                 [default: False]")
 
         args = parser.parse_args()
 
@@ -313,7 +321,7 @@ if __name__ == '__main__':
         # Set up DB path
         DB_PATH = args.db
         # Create Tracker with given hashtags
-        tracker = Tracker(args.hashtags)
+        tracker = Tracker(args.verbose, args.hashtags)
         stream = tracker.authenticate()
         # open db
         tracker.open_db()

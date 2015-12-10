@@ -26,11 +26,12 @@ CONSUMER_SECRET = "YOUR CONSUMER_SECRET"
 
 ## Usage
 ```
-usage: track.py [-h] --hashtags [HASHTAGS [HASHTAGS ...]] [-d DB]
+usage: track.py [-h] --hashtags [HASHTAGS [HASHTAGS ...]] [-d DB] [-v]
 
 optional arguments:
   -h, --help            show this help message and exit
   -d DB, --db DB        Path for the database file [default: database.db]
+  -v, --verbose         Show table with live data [default: False]
 
 mandatory arguments:
   --hashtags [HASHTAGS [HASHTAGS ...]]
