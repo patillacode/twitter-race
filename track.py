@@ -50,7 +50,7 @@ from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 
 logging.basicConfig(filename='track.log',
-                    level=logging.ERROR,
+                    level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(message)s')
 
 # Variables that contains the user credentials to access Twitter API
@@ -328,8 +328,8 @@ if __name__ == '__main__':
         # Capture data by the keywords
         stream.filter(track=tracker.hashtags)
 
-    except KeyboardInterrupt:
-        logging.debug("Farewell!")
+    except (KeyboardInterrupt, SystemExit):
+        logging.debug("User stopped the process. Farewell my friend!")
 
     except:
         logging.error(traceback.format_exc())
