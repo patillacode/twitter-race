@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='twitter-race',
-    version='0.1.0',
+    version='0.2.0',
     description='',
     license='GPLv2',
     packages=find_packages(),
