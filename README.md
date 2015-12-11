@@ -17,6 +17,8 @@ Keep track of different hashtags and see which one is winning
 
 ## Install
 
+------------
+
 ##### hashtag tracker (twitter-race)
 * `pip -r requirements.txt`
 * Remember to set your keys in a `keys.py` file (grab them [here](https://apps.twitter.com/))
@@ -27,9 +29,11 @@ CONSUMER_KEY = "YOUR CONSUMER_KEY"
 CONSUMER_SECRET = "YOUR CONSUMER_SECRET"
 ```
 
+------------
+
 ##### redis (I recommend you take a look [here](http://redis.io/topics/quickstart))
 ###### Although a small summary would be this:
-"""
+```
     $ wget http://download.redis.io/redis-stable.tar.gz # download redis
     $ tar xvzf redis-stable.tar.gz                      # uncompress it
     $ cd redis-stable                                   # move into the uncompressed folder
@@ -37,7 +41,7 @@ CONSUMER_SECRET = "YOUR CONSUMER_SECRET"
     $ make test                                         # run tests
     $ sudo cp src/redis-server /usr/local/bin/          # copy server command into your environment
     $ sudo cp src/redis-cli /usr/local/bin/             # copy client command into your environment
-"""
+```
 ######
 ------------
 
@@ -69,48 +73,49 @@ mandatory arguments:
 
 * to see redis stored keys:
 * log into your redis server (-n option is to see database 1 - default for this app)
-
-"""
+```
   $ redis-cli -h <host> -p <port> -n 1
-"""
+```
 
 * once in, check the existing keys like this:
-
-"""
+```
   localhost:6379[1]> keys *
     1) "health_counter"
     2) "love_counter"
     3) "money_counter"
     4) "sex_counter"
     5) "channels"
-"""
+```
 
 * to retrieve the content of a key
-
-"""
+```
   localhost:6379[1]> get love_counter
     "18"
-"""
+```
 
 * to see redis published data/events:
 * log into your redis server (-n option is to see database 1 - default for this app)
-
-"""
+```
   $ redis-cli -h <host> -p <port> -n 1
-"""
+```
 
 * once in, check the existing keys like this:
-
-"""
-  # channel id can be found in track.log)
+```
+  # channel id can be found in track.log (DEBUG level)
   localhost:6379[1]> PSUBSCRIBE your-channel-id
-"""
+```
 
 * An example of data published into the redis channel:
-
-"""
-  {'pattern': '05385555-6380-4cdf-966e-1701ba7494c5', 'type': 'pmessage', 'channel': '05385555-6380-4cdf-966e-1701ba7494c5', 'data': '{"text": "RT @GayWeHoDogs4U: #Rescue me! Adult male #Chihuahua/#Beagle mix.  #nkla #dogs #love https://t.co/v5iYldKcrh https://t.co/cLoVgVLlFg", "user": {"screen_name": "Serabbi", "id": "457904385", "name": "Serabbi"}, "event": "tweet", "hashtag": "love"}'}
-"""
+```
+  {'pattern': '05385555-6380-4cdf-966e-1701ba7494c5', 
+   'type': 'pmessage', 'channel': '05385555-6380-4cdf-966e-1701ba7494c5', 
+   'data': '{"text": "RT @GayWeHoDogs4U: #Rescue me! Adult male #Chihuahua/#Beagle mix.  #nkla #dogs #love https://t.co/v5iYldKcrh https://t.co/cLoVgVLlFg", 
+             "user": {"screen_name": "Serabbi", 
+                      "id": "457904385", 
+                      "name": "Serabbi"}, 
+             "event": "tweet", 
+             "hashtag": "love"}'}
+```
 
 ------------
 
