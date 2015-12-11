@@ -5,3 +5,8 @@ https://github.com/freelan-developers/chromalog
 Add redis opt in/out parameter
 
 Centralize (only one tracker instance)
+
+Add demo for better undertanding and add it to docs
+(redis + tracker)
+
+More/better log

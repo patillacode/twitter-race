@@ -1,19 +1,23 @@
 # twitter-race
-A python hashtag tracker for twitter [console based]
+A python hashtag tracker for twitter
 
 Keep track of different hashtags and see which one is winning
 
 * See live in your console how many tweets are being sent containing the hashtags your are looking for
-* Database stored counters for each hashtag given
-* Database stored tweets (as a json) that have one of your given hashtags (for a deeper later analysis if wanted)
-* You can specify the database name as a parameter to have multiple ones, for different analysis.
+* Redis stored counters for each hashtag given
+* Redis stored tweets (as a json) that have one of your given hashtags (for a deeper later analysis if wanted)
 
- #### Please report issues, enhancements you can think of, suggestions, whatever!
+
+###### Notes:
+* First beta release for local use can be found [here](https://github.com/patillacode/twitter-race/releases/tag/0.1.0)
+
+
+#### Please report issues, enhancements you can think of, suggestions, whatever!
 ------------
 
 ## Install
 
-### tracker (twitter-race)
+### hashtag tracker (twitter-race)
 * `pip -r requirements.txt`
 * Remember to set your keys in a `keys.py` file (grab them [here](https://apps.twitter.com/))
 ```
@@ -39,11 +43,10 @@ CONSUMER_SECRET = "YOUR CONSUMER_SECRET"
 
 ## Usage
 ```
-usage: track.py [-h] --hashtags [HASHTAGS [HASHTAGS ...]] [-d DB] [-v]
+usage: track.py [-h] [-v] --hashtags [HASHTAGS [HASHTAGS ...]]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -d DB, --db DB        Path for the database file [default: database.db]
   -v, --verbose         Show table with live data [default: False]
 
 mandatory arguments:
@@ -56,33 +59,58 @@ mandatory arguments:
 ## Example
 
 * To start tracking all tweets with #money, #sex, #love or #health
-* Run: `python track.py --hashtags money sex love health`
+* Run: `python track.py -v --hashtags money sex love health`
 
 * Output will be something like this:
 
 ![alt tag](http://i.imgur.com/VvIK5IN.png)
 
 * A logger file will be created: `track.log`
-* And a database file also: `database.db`
+
+* to see redis stored keys:
+* log into your redis server (-n option is to see database 1 - default for this app)
+"""
+  $ redis-cli -h <host> -p <port> -n 1
+"""
+
+* once in, check the existing keys like this:
+"""
+  localhost:6379[1]> keys *
+    1) "health_counter"
+    2) "love_counter"
+    3) "money_counter"
+    4) "sex_counter"
+    5) "channels"
+"""
+
+* to retrieve the content of a key
+"""
+  localhost:6379[1]> get love_counter
+    "18"
+"""
+
+* to see redis published data/events:
+* log into your redis server (-n option is to see database 1 - default for this app)
+"""
+  $ redis-cli -h <host> -p <port> -n 1
+"""
+
+* once in, check the existing keys like this:
+"""
+  # channel id can be found in track.log
+  localhost:6379[1]> PSUBSCRIBE <your-channel-id>
+"""
+
+* An example of data published into the redis channel:
+"""
+  {'pattern': '05385555-6380-4cdf-966e-1701ba7494c5', 'type': 'pmessage', 'channel': '05385555-6380-4cdf-966e-1701ba7494c5', 'data': '{"text": "RT @GayWeHoDogs4U: #Rescue me! Adult male #Chihuahua/#Beagle mix.  #nkla #dogs #love https://t.co/v5iYldKcrh https://t.co/cLoVgVLlFg", "user": {"screen_name": "Serabbi", "id": "457904385", "name": "Serabbi"}, "event": "tweet", "hashtag": "love"}'}
+"""
 
 ------------
 
 ## Notes
-* All hits will be stored in a db (`database.db` by default)
-* Also, a counter will be created in the database for each hashtag as `<hashtag>_counter`
-* To access the db run a python console and:
-```
-import shelve
-shelve.open('database.db')
-db.items()
-```
-* Alternatively you can use the Tracker class, just look at the code ;)
-* Remember the db is not accesible while the code is running to avoid 'Resource temporarily unavailable' issues when db gets hit a lot (I created this with no expectations, a better db mangement would be nice, yes, feel free to add it and pull request, I will be happy to adopt that feature!)
+* All hits will be published into a unique redis channel
+* Also, a counter will be created in redis as a key, like: `<hashtag>_counter`
 * Not Python 3.x compatible (yet)
 * Python 2.7.9 or higher is needed because of [this](https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning)
-* DB structure is something like this (key, value):
-```
-db['<yourhastag>_counter'] = 17
-db['<tweet_id>'] = {<tweeet>}
-```
-* Example of [storaged tweet](https://gist.github.com/patillacode/1fc239540ec006dd70a7#file-tweet-py)
+* Example of a captured [raw tweet](https://gist.github.com/patillacode/1fc239540ec006dd70a7#file-tweet-py)

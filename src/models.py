@@ -2,12 +2,14 @@ import os
 import sys
 import keys
 import json
-import shelve
 import logging
 
+from uuid import uuid4
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
+
+import settings
 
 # Variables that contains the user credentials to access Twitter API
 ACCESS_TOKEN = keys.ACCESS_TOKEN
@@ -53,8 +55,19 @@ class Listener(StreamListener):
                     setattr(self.tracker, counter, hits)
                     # store it in database
                     self.tracker.set_data(counter, hits)
-                    # store whole tweet in database
-                    self.tracker.set_data(str(data['id']), data)
+                    # create data to be published in channel
+                    data_to_publish = {}
+                    data_to_publish.update({'event': 'tweet'})
+                    data_to_publish.update({'hashtag': h['text']})
+                    data_to_publish.update(
+                        {'text': data['text'].encode('utf-8')})
+                    user_data = {'id': data['user']['id_str'],
+                                 'name': data['user']['name'].encode('utf-8'),
+                                 'screen_name': data['user']['screen_name']
+                                 }
+                    data_to_publish.update({'user': user_data})
+                    # publish data
+                    self.tracker.publish_data(data_to_publish)
                     # show results table in console if verbose was indicated
                     if self.tracker.verbose:
                         self.tracker.print_table()
@@ -76,7 +89,8 @@ class Tracker():
         Main class that handles most of our app.
 
         Attributes:
-            db (str): path to db
+            redis (Redis): redis connection (settings)
+            channel (str): channel unique identifier
             hashtags (list): hashtags to keep track of
             known_items (list): all known attributes of the class
             listener (Listener): Twitter StreamListener
@@ -96,12 +110,15 @@ class Tracker():
             sys.exit(2)
 
         # Set all static attributes
-        self.db = None
         self.stream = None
         self.listener = None
+        self.verbose = verbose
         self.hashtags = hashtags
         self.set_longest_hashtag()
-        self.verbose = verbose
+        self.redis = settings.REDIS
+        self.create_redis_channels()
+        self.set_unique_redis_channel()
+
         # define vars needed for console output (also static)
         self.cell_size = (self.longest + 3)
         self.counter_whitespace = " " * ((self.cell_size - 6) / 2)
@@ -111,24 +128,39 @@ class Tracker():
         for h in self.hashtags:
             setattr(self, "{0}_counter".format(h), 0)
 
+    def create_redis_channels(self):
+        """
+            Creates 'channels' in redis if it doesn't exist
+            'channels' is to keep track of existing publishing channels
+        """
+        if "channels" not in self.redis.keys():
+            self.redis.set("channels", json.dumps({"channels": []}))
+
+    def set_unique_redis_channel(self):
+        """ Creates a unique channel id """
+        channel_id = str(uuid4())
+        used_channels = json.loads(self.redis.get("channels"))["channels"]
+        if channel_id in used_channels:
+            self.get_unique_redis_channel()
+        else:
+            self.channel = channel_id
+            used_channels.append(channel_id)
+            self.redis.set("channels", json.dumps({"channels": used_channels}))
+
     def set_data(self, key, value):
+        """ Set a key/value pair in redis """
+        self.redis.set(key, value)
+
+    def publish_data(self, data):
         """
 
-            To set a value in the database
+            Publish data/event in a channel
 
             Args:
-                key (str): the key for the record to be saved
-                value (*): the value for the record to be saved
+                data: data to publish in redis
         """
-        self.db[key] = value
-
-    def open_db(self, path):
-        """ Opens the db file to be accessed """
-        self.db = shelve.open(path)
-
-    def close_db(self):
-        """ Closes the db file """
-        self.db.close()
+        logging.debug("publishing to channel {0}".format(self.channel))
+        self.redis.publish(self.channel, json.dumps(data))
 
     def authenticate(self):
         """

@@ -72,12 +72,6 @@ if __name__ == '__main__':
                                required=True,
                                nargs='*',
                                help="")
-        parser.add_argument("-d",
-                            "--db",
-                            required=False,
-                            default="database.db",
-                            help="Path for the database file \
-                                  [default: database.db]")
         parser.add_argument("-v",
                             "--verbose",
                             required=False,
@@ -96,8 +90,6 @@ if __name__ == '__main__':
         # Create Tracker with given hashtags
         tracker = Tracker(args.verbose, args.hashtags)
         stream = tracker.authenticate()
-        # open db
-        tracker.open_db(args.db)
         # Capture data by the keywords
         stream.filter(track=tracker.hashtags)
 
@@ -106,7 +98,3 @@ if __name__ == '__main__':
 
     except:
         logging.error(traceback.format_exc())
-
-    finally:
-        # Always close db
-        tracker.close_db()
