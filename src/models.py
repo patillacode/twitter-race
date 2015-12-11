@@ -25,6 +25,8 @@ COLORS = {'magenta': '35',
           'white': '37;1',
           'yellow': '33'}
 
+ATTR_COUNTER_FORMAT = '{0}_counter'
+
 
 class Listener(StreamListener):
     """This is a basic listener that just prints received tweets."""
@@ -44,33 +46,32 @@ class Listener(StreamListener):
         if 'entities' in data and 'hashtags' in data['entities']:
             hashtags = data['entities']['hashtags']
 
-        if len(hashtags):
-            for h in hashtags:
-                if h['text'] in self.tracker.hashtags:
-                    # we get the hashtag name
-                    counter = "{0}_counter".format(h['text'])
-                    # we add 1 to the actual counter
-                    hits = getattr(self.tracker, counter) + 1
-                    # we set the new value
-                    setattr(self.tracker, counter, hits)
-                    # store it in database
-                    self.tracker.set_data(counter, hits)
-                    # create data to be published in channel
-                    data_to_publish = {}
-                    data_to_publish.update({'event': 'tweet'})
-                    data_to_publish.update({'hashtag': h['text']})
-                    data_to_publish.update(
-                        {'text': data['text'].encode('utf-8')})
-                    user_data = {'id': data['user']['id_str'],
-                                 'name': data['user']['name'].encode('utf-8'),
-                                 'screen_name': data['user']['screen_name']
-                                 }
-                    data_to_publish.update({'user': user_data})
-                    # publish data
-                    self.tracker.publish_data(data_to_publish)
-                    # show results table in console if verbose was indicated
-                    if self.tracker.verbose:
-                        self.tracker.print_table()
+        for h in hashtags:
+            if h['text'] in self.tracker.hashtags:
+                hashtag_name = h['text']
+                # we add 1 to the actual counter
+                hits = getattr(self.tracker, hashtag_name) + 1
+
+                # we set the new value
+                counter = ATTR_COUNTER_FORMAT.format(h['text'])
+                setattr(self.tracker, counter, hits)
+                # store it in database
+                self.tracker.set_data(counter, hits)
+                # create data to be published in channel
+                data_to_publish = {}
+                data_to_publish.update({'event': 'tweet'})
+                data_to_publish.update({'hashtag': h['text']})
+                data_to_publish.update(
+                    {'text': data['text'].encode('utf-8')})
+                user_data = {'id': data['user']['id_str'],
+                             'name': data['user']['name'].encode('utf-8'),
+                             'screen_name': data['user']['screen_name']
+                             }
+                data_to_publish.update({'user': user_data})
+                # publish data
+                self.tracker.publish_data(data_to_publish)
+                if self.tracker.verbose:
+                    self.tracker.print_table()
         return True
 
     def on_error(self, status):
@@ -103,12 +104,6 @@ class Tracker():
             Args:
                 hashtags (list, optional): hashtags entered as parameters
         """
-        # Confirm hashtags are given in a list
-        try:
-            assert(isinstance(hashtags, list))
-        except AssertionError:
-            sys.exit(2)
-
         # Set all static attributes
         self.stream = None
         self.listener = None
@@ -127,6 +122,13 @@ class Tracker():
         # Set dynamic attributes (counters for each hashtag)
         for h in self.hashtags:
             setattr(self, "{0}_counter".format(h), 0)
+
+    def __getattr__(self, name):
+        try:
+            counter = ATTR_COUNTER_FORMAT.format(name)
+            return getattr(self, counter)
+        except:
+            raise AttributeError
 
     def create_redis_channels(self):
         """
@@ -192,8 +194,7 @@ class Tracker():
         """
         winner = {'hashtag': '', 'value': 0}
         for h in self.hashtags:
-            counter = "{0}_counter".format(h)
-            hits = getattr(self, counter)
+            hits = getattr(self, h)
             if hits > winner['value']:
                 winner['hashtag'] = h
                 winner['value'] = hits
@@ -231,8 +232,7 @@ class Tracker():
             hashtag_whitespace = " " * (self.longest - len(hashtag) + 3)
 
             # get number of hits for each hashtag
-            counter = "{0}_counter".format(hashtag)
-            hits = getattr(self, counter)
+            hits = getattr(self, hashtag)
 
             # set winner banner and color for output
             winner_banner = ''
