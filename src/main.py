@@ -40,7 +40,7 @@ import sys
 import logging
 import traceback
 
-from track import Tracker
+from models import Tracker
 
 
 class TrackParser(argparse.ArgumentParser):
