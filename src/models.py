@@ -163,8 +163,6 @@ class Tracker():
         """
         winner = {'hashtag': '', 'value': 0}
         for h in self.hashtags:
-            # counter = "{0}_counter".format(h)
-            # hits = getattr(self, counter)
             hits = getattr(self, h)
             if hits > winner['value']:
                 winner['hashtag'] = h
@@ -203,8 +201,6 @@ class Tracker():
             hashtag_whitespace = " " * (self.longest - len(hashtag) + 3)
 
             # get number of hits for each hashtag
-            # counter = "{0}_counter".format(hashtag)
-            # hits = getattr(self, counter)
             hits = getattr(self, hashtag)
 
             # set winner banner and color for output
