@@ -1,11 +1,11 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='twitter-race',
     version='0.0.6',
     description='',
     license='GPLv2',
-    py_modules=['track'],
+    packages=find_packages(),
     author='patillacode',
     author_email='patillacode@gmail.com',
     url='https://github.com/patillacode/twitter-race',
