@@ -13,6 +13,7 @@ Keep track of different hashtags and see which one is winning
 
 ## Install
 
+### tracker (twitter-race)
 * `pip -r requirements.txt`
 * Remember to set your keys in a `keys.py` file (grab them [here](https://apps.twitter.com/))
 ```
@@ -22,6 +23,18 @@ CONSUMER_KEY = "YOUR CONSUMER_KEY"
 CONSUMER_SECRET = "YOUR CONSUMER_SECRET"
 ```
 
+### redis (I recommend you take a look [here](http://redis.io/topics/quickstart))
+###### Although a small summary would be this:
+"""
+    $ wget http://download.redis.io/redis-stable.tar.gz # download redis
+    $ tar xvzf redis-stable.tar.gz                      # uncompress it
+    $ cd redis-stable                                   # move into the uncompressed folder
+    $ make                                              # install
+    $ make test                                         # run tests
+    $ sudo cp src/redis-server /usr/local/bin/          # copy server command into your environment
+    $ sudo cp src/redis-cli /usr/local/bin/             # copy client command into your environment
+"""
+######
 ------------
 
 ## Usage
