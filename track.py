@@ -30,8 +30,8 @@
 # description     :Stream Listener and tracker for tweets with given hashtags
 # author          :PatilaCode
 # date            :20151203
-# version         :0.1
-# usage           :python track.py --hashtags <hashtag#1> ... <hashtag#n>
+# version         :0.0.6
+# usage           :python track.py -v --hashtags <hashtag#1> ... <hashtag#n>
 # notes           :
 # python_version  :2.7.10
 # =============================================================================

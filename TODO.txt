@@ -1,0 +1,11 @@
+Models?
+
+Maybe switch to https://github.com/jamesls/semidbm instead of shelve - NOPE :(
+Redis?
+
+
+colored logs? just for fun
+https://pypi.python.org/pypi/coloredlogs
+https://github.com/freelan-developers/chromalog
+
+multiple threads? only one filter database by key?
