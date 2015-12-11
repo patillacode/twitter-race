@@ -31,7 +31,7 @@ CONSUMER_SECRET = "YOUR CONSUMER_SECRET"
 
 ------------
 
-##### redis (I recommend you take a look [here](http://redis.io/topics/quickstart))
+##### redis (recommended you take a look [here](http://redis.io/topics/quickstart))
 ###### Although a small summary would be this:
 ```
     $ wget http://download.redis.io/redis-stable.tar.gz # download redis
@@ -62,7 +62,7 @@ mandatory arguments:
 
 ## Example
 
-* To start tracking all tweets with #money, #sex, #love or #health
+##### To start tracking all tweets with #money, #sex, #love or #health
 * Run: `python track.py -v --hashtags money sex love health`
 
 * Output will be something like this:
@@ -71,7 +71,7 @@ mandatory arguments:
 
 * A logger file will be created: `track.log`
 
-* to see redis stored keys:
+##### To see redis stored keys:
 * log into your redis server (-n option is to see database 1 - default for this app)
 ```
   $ redis-cli -h <host> -p <port> -n 1
@@ -87,13 +87,13 @@ mandatory arguments:
     5) "channels"
 ```
 
-* to retrieve the content of a key
+##### To retrieve the content of a key
 ```
   localhost:6379[1]> get love_counter
     "18"
 ```
 
-* to see redis published data/events:
+##### To see redis published data/events:
 * log into your redis server (-n option is to see database 1 - default for this app)
 ```
   $ redis-cli -h <host> -p <port> -n 1
@@ -105,7 +105,7 @@ mandatory arguments:
   localhost:6379[1]> PSUBSCRIBE your-channel-id
 ```
 
-* An example of data published into the redis channel:
+##### An example of data published into the redis channel:
 ```
   {'pattern': '05385555-6380-4cdf-966e-1701ba7494c5', 
    'type': 'pmessage', 'channel': '05385555-6380-4cdf-966e-1701ba7494c5', 
