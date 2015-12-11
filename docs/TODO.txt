@@ -1,0 +1,7 @@
+colored logs? just for fun
+https://pypi.python.org/pypi/coloredlogs
+https://github.com/freelan-developers/chromalog
+
+Add redis opt in/out parameter
+
+Centralize (only one tracker instance)
