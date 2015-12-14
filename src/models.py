@@ -25,6 +25,7 @@ COLORS = {'magenta': '35',
           'white': '37;1',
           'yellow': '33'}
 
+# Format of attribute name created from hashtag
 ATTR_COUNTER_FORMAT = '{0}_counter'
 
 
@@ -124,6 +125,14 @@ class Tracker():
             setattr(self, "{0}_counter".format(h), 0)
 
     def __getattr__(self, name):
+        """
+        Access to attributes.
+
+        As some attributes are created dynamically, depending on hashtags
+        list passed into the constructor, this method allows to access
+        them via hashtag name not the custom format of the attribute name.
+
+        """
         try:
             counter = ATTR_COUNTER_FORMAT.format(name)
             return getattr(self, counter)
